@@ -9,7 +9,7 @@ import com.typesafe.config.ConfigFactory
 /**
  * Created by pdesai on 10/10/15.
  */
-object s3 {
+object S3Client {
   var amazonS3Client: AmazonS3Client = null
   var s3Bucket: String = null
 

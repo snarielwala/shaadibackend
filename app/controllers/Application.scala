@@ -3,10 +3,10 @@ package controllers
 import java.io.File
 
 import model.Photo
+import org.joda.time.DateTime
+import play.api.libs.json.Json
 import play.api.mvc._
-import src.main.scala.sqlClient
-
-import scala.util.Random
+import src.main.scala.SQLClient
 
 class Application extends Controller {
 
@@ -14,20 +14,27 @@ class Application extends Controller {
     Ok(views.html.index("Your new application is ready."))
   }
 
-  def postPhoto = Action(parse.multipartFormData) { request =>
+  def newfeed = Action {
+    SQLClient.listPhotos match {
+      case Left(e) => Ok(e)
+      case Right(listOfPhotos) => Ok(Json.toJson(listOfPhotos))
+    }
+  }
+
+  def postPhoto(caption: String) = Action(parse.multipartFormData) { request =>
 
     request.body.file("file").map { photo =>
       val photoFilename = photo.filename
       val contentType = photo.contentType.get
-      val localFile = new File("/tmp/" + photoFilename + Random.nextDouble())
+      val localFile = new File("/tmp/" + photoFilename + DateTime.now())
       photo.ref.moveTo(localFile)
 
       println(localFile)
 
-      val uploadResult = aws.s3.uploadFile(localFile.getName, localFile)
+      val uploadResult = aws.S3Client.uploadFile(localFile.getName, localFile)
       uploadResult match {
         case Right(url) => println(uploadResult.right.get.toString)
-          sqlClient.insertIntoTable(new Photo(1, "Caption", url, contentType))
+          SQLClient.insertPhoto(new Photo(1, caption, url, contentType))
           Ok("Photo uploaded successfull")
         case Left(message) => println(message)
           Ok("Upload failed. Try again.")
