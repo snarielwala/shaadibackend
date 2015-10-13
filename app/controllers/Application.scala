@@ -35,7 +35,7 @@ class Application extends Controller {
       uploadResult match {
         case Right(url) => println(uploadResult.right.get.toString)
           SQLClient.insertPhoto(new Photo(1, caption, url, contentType))
-          Ok("Photo uploaded successfull")
+          Ok("{file_uploaded}")
         case Left(message) => println(message)
           Ok("Upload failed. Try again.")
       }
