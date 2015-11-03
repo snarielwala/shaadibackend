@@ -7,6 +7,8 @@ import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.mvc._
 import src.main.scala.SQLClient
+import play.api.Logger
+
 
 class Application extends Controller {
 
@@ -14,33 +16,49 @@ class Application extends Controller {
     Ok(views.html.index("Your new application is ready."))
   }
 
-  def newfeed = Action {
+  def newsfeed = Action { request =>
+    val address=request.remoteAddress
+    val timestamp = System.currentTimeMillis()
+
+    Logger.info("Newsfeed Request from IP:"+address +",Time:"+timestamp)
+
     SQLClient.listPhotos match {
-      case Left(e) => Ok(e)
-      case Right(listOfPhotos) => Ok(Json.toJson(listOfPhotos))
+      case Left(e) =>{
+        Logger.info("Empty Photo List, from IP:"+address + ", Time:"+timestamp)
+        Ok(e)
+      }
+      case Right(listOfPhotos) => {
+        Logger.info("Responding with Photo List, from IP:"+address + ", Time:"+timestamp)
+        Ok(Json.toJson(listOfPhotos))
+      }
     }
   }
 
   def postPhoto = Action(parse.multipartFormData) { request =>
 
-    println(request.body.dataParts("caption").head.toString)
+    val address=request.remoteAddress
+    val timestamp = System.currentTimeMillis()
+
+    Logger.info("PostPhoto Request from IP:"+address +", Time:"+timestamp)
+
     request.body.file("file").map { photo =>
       val photoFilename = photo.filename
       val contentType = photo.contentType.get
       val localFile = new File("/tmp/" + DateTime.now() + photoFilename)
       photo.ref.moveTo(localFile)
-      println(request.body.dataParts("caption").toString())
-      println(localFile)
+
+      Logger.info("Photo moved to Location:"+localFile.toString+"from IP:"+address +", Time:"+timestamp)
 
       val uploadResult = aws.S3Client.uploadFile(localFile.getName, localFile)
       uploadResult match {
-        case Right(url) => println(uploadResult.right.get.toString)
+        case Right(url) => Logger.info("Photo Upload to s3 successful:"+uploadResult.right.get.toString+"from IP:"+address +", Time:"+timestamp)
           SQLClient.insertPhoto(new Photo(1,request.body.dataParts("caption").head.toString(), url, contentType))
           Ok("{image_uploaded}")
-        case Left(message) => println(message)
+        case Left(message) => Logger.info("Photo Upload to s3 failed:"+message+"from IP:"+address+", Time:"+timestamp)
           Ok("Upload failed. Try again.")
       }
     }.getOrElse {
+      Logger.info("Invalid Parameters from IP:"+address+", Time:"+timestamp)
       Ok("Invalid parameters.")
     }
   }

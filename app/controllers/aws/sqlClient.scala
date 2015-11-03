@@ -7,6 +7,7 @@ import scala.collection.immutable.HashMap
 import scala.collection.mutable.ListBuffer
 import scala.util.control.NonFatal
 
+
 /**
  * Created by pdesai on 10/11/15.
  */
@@ -59,7 +60,7 @@ object SQLClient {
           "IMAGE")
       }
       photoList.isEmpty match {
-        case true => Left("[]")
+        case true =>Left("[]")
         case false => Right(photoList.toSeq)
       }
     }
