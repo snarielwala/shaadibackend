@@ -27,7 +27,7 @@ class Application extends Controller {
     request.body.file("file").map { photo =>
       val photoFilename = photo.filename
       val contentType = photo.contentType.get
-      val localFile = new File("/tmp/" + DateTime.now()+".jpg")
+      val localFile = new File("/tmp/" + DateTime.now() + photoFilename)
       photo.ref.moveTo(localFile)
       println(request.body.dataParts("caption").toString())
       println(localFile)
