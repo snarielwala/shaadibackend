@@ -5,7 +5,7 @@
 # Home page
 GET     /                           controllers.Application.index
 GET     /debug                      controllers.Application.debug
-GET     /newsfeed                   controllers.Application.newfeed
+GET     /newsfeed                   controllers.Application.newsfeed
 POST    /photos                     controllers.Application.postPhoto
 
 
