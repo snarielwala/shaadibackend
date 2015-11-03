@@ -1,4 +1,11 @@
 This is your new Play application
 =================================
 
-This file will be packaged with your application, when using `activator dist`.
+This file will be packaged with your application, when using `activator dist`
+
+
+#RUNNING THIS PROJECT
+
+"./activator stage" from the project folder creates a runnable in target/universal/stage/bin/
+"nohup ./shaadibackend &" from target/universal/stage/bin/ runs the project in the background
+"shaadilogs" will take you to the log folder for the application
