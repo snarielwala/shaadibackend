@@ -47,20 +47,20 @@ object SQLClient {
   
   def listPhotos = {
     val func = "listPhotos"
-    val truckList = new ListBuffer[Photo]
+    val photoList = new ListBuffer[Photo]
 
     try {
-      val stmt = preparedStmt.get("listPhotos").get
+      val stmt = connection.prepareStatement("Select * FROM newsfeed")
       val rs = stmt.executeQuery()
       while (rs.next()) {
-        truckList += Photo(rs.getInt("id"),
+        photoList += Photo(rs.getInt("id"),
           rs.getString("caption"),
           rs.getString("url"),
-          rs.getString("mediaType"))
+          "IMAGE")
       }
-      truckList.isEmpty match {
-        case true => Left("No data found")
-        case false => Right(truckList.toSeq)
+      photoList.isEmpty match {
+        case true => Left("[]")
+        case false => Right(photoList.toSeq)
       }
     }
     catch{

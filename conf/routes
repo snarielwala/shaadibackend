@@ -6,7 +6,7 @@
 GET     /                           controllers.Application.index
 GET     /debug                      controllers.Application.debug
 GET     /newsfeed                   controllers.Application.newfeed
-POST    /photos                     controllers.Application.postPhoto(caption: String ?= "Default Caption")
+POST    /photos                     controllers.Application.postPhoto
 
 
 # Map static resources from the /public folder to the /assets URL path

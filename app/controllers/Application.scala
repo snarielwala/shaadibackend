@@ -21,20 +21,21 @@ class Application extends Controller {
     }
   }
 
-  def postPhoto(caption: String) = Action(parse.multipartFormData) { request =>
+  def postPhoto = Action(parse.multipartFormData) { request =>
 
+    println(request.body.dataParts("caption").head.toString)
     request.body.file("file").map { photo =>
       val photoFilename = photo.filename
       val contentType = photo.contentType.get
-      val localFile = new File("/tmp/" + photoFilename + DateTime.now())
+      val localFile = new File("/tmp/" + DateTime.now()+".jpg")
       photo.ref.moveTo(localFile)
-
+      println(request.body.dataParts("caption").toString())
       println(localFile)
 
       val uploadResult = aws.S3Client.uploadFile(localFile.getName, localFile)
       uploadResult match {
         case Right(url) => println(uploadResult.right.get.toString)
-          SQLClient.insertPhoto(new Photo(1, caption, url, contentType))
+          SQLClient.insertPhoto(new Photo(1,request.body.dataParts("caption").head.toString(), url, contentType))
           Ok("{file_uploaded}")
         case Left(message) => println(message)
           Ok("Upload failed. Try again.")
