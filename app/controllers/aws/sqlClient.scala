@@ -24,6 +24,7 @@ object SQLClient {
 
     // make the connection
     Class.forName(driver)
+
     connection = DriverManager.getConnection(url, username, password)
 
     preparedStmt += "insertIntoTable" -> connection.prepareStatement("INSERT INTO newsfeed (caption, url, mediaType) VALUES (?, ?, ?)")
@@ -32,6 +33,8 @@ object SQLClient {
 
   def insertPhoto(photo: Photo) : Either[String, String]= {
     val func = "insertIntoTable"
+    if(connection.isClosed) init()
+
     try {
       val stmt = preparedStmt.get("insertIntoTable").get
       stmt.setString(1, s"${photo.caption}")
@@ -49,9 +52,10 @@ object SQLClient {
   def listPhotos = {
     val func = "listPhotos"
     val photoList = new ListBuffer[Photo]
+    if(connection.isClosed) init()
 
     try {
-      val stmt = connection.prepareStatement("Select * FROM newsfeed")
+      val stmt = preparedStmt.get("listPhotos").get
       val rs = stmt.executeQuery()
       while (rs.next()) {
         photoList += Photo(rs.getInt("id"),
