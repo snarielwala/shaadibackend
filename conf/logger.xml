@@ -16,8 +16,9 @@
     <!-- additivity=false ensures access log data only goes to the access log -->
     <logger name="FILE" level="INFO"/>
 
+    
     <root level="INFO">
-        <appender-ref ref="FILE" />
+    	 <appender-ref ref="FILE" />
     </root>
 
 </configuration>

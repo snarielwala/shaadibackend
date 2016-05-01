@@ -43,11 +43,12 @@ class Application extends Controller {
 
     request.body.file("file").map { photo =>
       val photoFilename = photo.filename
-      val contentType = photo.contentType.get
+      //val contentType = photo.contentType.get
+      val contentType = request.body.dataParts("mediatype").head.toString() 
       val localFile = new File("/tmp/" + DateTime.now() + photoFilename)
       photo.ref.moveTo(localFile)
 
-      Logger.info("Photo moved to Location:"+localFile.toString+"from IP:"+address +", Time:"+timestamp)
+      Logger.info("Photo moved to Location:"+localFile.toString+"from IP:"+address +", Time:"+timestamp+" mediatype:" + contentType)
 
       val uploadResult = aws.S3Client.uploadFile(localFile.getName, localFile)
       uploadResult match {

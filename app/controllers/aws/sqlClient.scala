@@ -18,10 +18,10 @@ object SQLClient {
 
   def init(): Unit = {
     val driver = "com.mysql.jdbc.Driver"
-    val url = ""
-    val username = ""
-    val password = ""
-
+    val url = "jdbc:mysql://foodtruck.cukgg5qp8wfv.us-west-2.rds.amazonaws.com:3306/foodtruck"
+    val username = "desipride"
+    val password = "parthpriyankishansamarth"	
+    
     // make the connection
     Class.forName(driver)
 
@@ -55,13 +55,13 @@ object SQLClient {
     if(connection.isClosed) init()
 
     try {
-      val stmt = preparedStmt.get("listPhotos").get
+      val stmt = connection.prepareStatement("SELECT * FROM newsfeed")
       val rs = stmt.executeQuery()
       while (rs.next()) {
         photoList += Photo(rs.getInt("id"),
           rs.getString("caption"),
           rs.getString("url"),
-          "IMAGE")
+          rs.getString("mediaType"))
       }
       photoList.isEmpty match {
         case true =>Left("[]")
